@@ -41,6 +41,7 @@ def _background_scraper_task():
         if TodaysNews.objects.filter(date=today).exists():
             return
 
+        print("Scraper started")
         TodaysNews.objects.create()
         
         scrapper = WebScrapper()
@@ -67,6 +68,7 @@ def _background_scraper_task():
                 )
         
         TrainModel().trainModel()
+        print("Model Trained")
 
     except Exception as e:
         print(f"Error in background scraper: {e}")
