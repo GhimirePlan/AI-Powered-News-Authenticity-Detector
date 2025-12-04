@@ -1,150 +1,218 @@
-from django.shortcuts import render,HttpResponse,redirect
-import json,random
-from .models import Feedback,ReportIssue,TodaysNews,News
-from datetime import datetime 
-from .webscrapper import WebScrapper
-from .TrainingModel.AuthenticityChecker import AuthenticityChecker,Prediction
-from threading import Timer
-from FakeNewsDetectionBackend.settings import IsThreadStarted
-from .TrainingModel.trainer import TrainModel
+import threading
+import json
+import hashlib
+from datetime import datetime
+from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-import pandas as pd
-from googletrans import Translator,LANGCODES
+from django.utils import timezone
+from googletrans import Translator
 
-# Create your views here.
-configuration={
-    "10":"Unauthentic",
-    "30":"Likely Unauthentic",
-    "60":"Possibly Unauthentic",
-    "95":"Likely Authentic",    
-    "100":"Authentic"
-    
+from django.views.decorators.csrf import csrf_exempt
+from .models import Feedback, ReportIssue, TodaysNews, News, UserQueryLog
+from .webscrapper import WebScrapper
+from .TrainingModel.AuthenticityChecker import AuthenticityChecker, Prediction
+from .TrainingModel.trainer import TrainModel
+
+CONFIGURATION = {
+    "10": "Unauthentic",
+    "30": "Likely Unauthentic",
+    "60": "Possibly Unauthentic",
+    "95": "Likely Authentic",    
+    "100": "Authentic"
 }
-def AddTodayNewsIfNotExists():
-    global IsThreadStarted
-    if IsThreadStarted:
+
+SCRAPER_LOCK = threading.Lock()
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+def _background_scraper_task():
+    if not SCRAPER_LOCK.acquire(blocking=False):
         return
-    IsThreadStarted=True
-    today=datetime.today().date()
-    if not TodaysNews.objects.filter(date=today).exists():
-        print("adding today news")
+
+    try:
+        today = datetime.today().date()
+        if TodaysNews.objects.filter(date=today).exists():
+            return
+
         TodaysNews.objects.create()
-        scrapper=WebScrapper()
-        data:News
-        predictor=Prediction()
-        #add todays news 
-        fakenews=News.objects.filter(isfake=True)
-        fakenew=fakenews[random.randint(0,fakenews.count())]
-        for data in scrapper.lists:
-            News.objects.create(description=predictor.getPurified(data.description),source=data.source)
-            News.objects.create(description=fakenew.description,source=data.source,isfake=True)
-        IsThreadStarted=False
+        
+        scrapper = WebScrapper()
+        predictor = Prediction()
+        
+        fake_news_sample = News.objects.filter(isfake=True).order_by('?').first()
+        fake_desc = fake_news_sample.description if fake_news_sample else "Fake news placeholder"
+
+        for item in scrapper.lists:
+            if not News.objects.filter(title=item.title).exists():
+                News.objects.create(
+                    title=item.title,
+                    description=predictor.getPurified(item.description),
+                    source=item.source,
+                    isfake=False,
+                    meta_data={"original_url": item.source, "scraped_at": str(timezone.now())}
+                )
+                
+                News.objects.create(
+                    title="Fake: " + item.title,
+                    description=fake_desc,
+                    source="Generated-Fake",
+                    isfake=True
+                )
+        
         TrainModel().trainModel()
-    
+
+    except Exception as e:
+        print(f"Error in background scraper: {e}")
+    finally:
+        SCRAPER_LOCK.release()
+
+def trigger_scraper_if_needed():
+    today = datetime.today().date()
+    if not TodaysNews.objects.filter(date=today).exists():
+        t = threading.Thread(target=_background_scraper_task, daemon=True)
+        t.start()
+
+def perform_fake_news_check(query_text, request_obj):
+    translator = Translator()
+    try:
+        lang_detect = translator.detect(query_text)
+        source_lang = lang_detect.lang
+        
+        if source_lang != 'ne':
+            translated_text = translator.translate(query_text, dest="ne").text
+            input_for_model = translated_text
+        else:
+            translated_text = query_text
+            input_for_model = query_text
+    except Exception:
+        source_lang = 'ne'
+        input_for_model = query_text
+
+    score = AuthenticityChecker().check(input_for_model)
+
+    label = "Unauthentic"
+    prev_threshold = 0
+    for threshold, val in CONFIGURATION.items():
+        if score < int(threshold) and score >= prev_threshold:
+            label = val
+            break
+        prev_threshold = int(threshold)
+
+    if request_obj.user.is_authenticated:
+        user_identifier = str(request_obj.user.id)
+    else:
+        user_identifier = request_obj.session.session_key or get_client_ip(request_obj)
+
+    hashed_id = hashlib.sha256(str(user_identifier).encode()).hexdigest()
+
+    UserQueryLog.objects.create(
+        user_hash=hashed_id,
+        query_text=query_text,
+        prediction_score=score,
+        prediction_label=label,
+        explainability_data={"input_length": len(input_for_model), "lang": source_lang}
+    )
+
+    if source_lang != 'ne':
+        final_status = translator.translate(label, dest=source_lang).text
+    else:
+        final_status = label
+
+    return final_status, score
+
 def MainPage(request):
-    #checking and add today news
-    Timer(10,AddTodayNewsIfNotExists).start()
-    return render (request, "index.html")
+    trigger_scraper_if_needed()
+    return render(request, "index.html")
+
 @login_required
 def Download(request):
-    #checking and add today news
-    return render (request, "download.html")
+    return render(request, "download.html")
 
 def ResultPage(request):
-    translater=Translator()
-    #checking and add today news
-    Timer(10,AddTodayNewsIfNotExists).start()
-    if not request.GET.get("q"):
-        return render (request,"searchreasult.html")
-    query=request.GET.get("q")
-    source=translater.detect(query)
-    translated=translater.translate(query, dest="ne").text
-    if isinstance(translated,str):
-        status=AuthenticityChecker().check(translated)
-    else:
-        status=AuthenticityChecker().check(query)
-    authentic=""
-    previous=0
-    for key,value in configuration.items():
-        if status<int(key) and status>previous:
-            authentic=value
-        previous=int(key)
-    #furhter handling from model trainer to search reasult and get result to render to the dom
-    try:
-        return render (request,"searchreasult.html",{"status":translater.translate(authentic,dest=source.lang).text,"searchfor":query, "percentage":status})
-    except:
-        return render (request,"searchreasult.html",{"status":authentic,"searchfor":query, "percentage":status})
-def GetReviews(request):
-    lists=[]
-    for feedback in Feedback.objects.all():
-        lists.append({
-            "reviews":feedback.reviews,
-            "message":feedback.message,
-            "Username":feedback.user.first_name+" "+feedback.user.last_name
-        })
-    return HttpResponse(json.dumps(lists))
+    trigger_scraper_if_needed()
+    
+    query = request.GET.get("q")
+    if not query:
+        return render(request, "searchreasult.html")
 
+    status_text, percentage = perform_fake_news_check(query, request)
+
+    context = {
+        "status": status_text,
+        "searchfor": query, 
+        "percentage": percentage
+    }
+    return render(request, "searchreasult.html", context)
+
+@csrf_exempt
 def ResultForExtension(request):
-    translater=Translator()
-    #checking and add today news
-    Timer(10,AddTodayNewsIfNotExists).start()
-    if request.method=="POST":
-        query=request.POST["content"]
-        #further process from model 
-        source=translater.detect(query)
-        translated=translater.translate(query, dest="ne").text
-        if isinstance(translated,str):
-            status=AuthenticityChecker().check(translated)
-        else:
-            status=AuthenticityChecker().check(query)
-        authentic=""
-        previous=0
-        for key,value in configuration.items():
-            if status<int(key) and status>previous:
-                authentic=value
-            previous=int(key)
-        return HttpResponse(json.dumps({
-            "authentic":translater.translate(authentic,dest=source.lang).text,
-            "accuracy":status,
-            "searchfor":query
-            }),content_type="application/json")
-    return HttpResponse(json.dumps({
-        "status":False
-    }),content_type="application/json")
+    if request.method == "POST":
+        try:
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                query = data.get("content")
+            else:
+                query = request.POST.get("content")
+            
+            if not query:
+                return JsonResponse({"status": False, "error": "No content provided"})
+
+            status_text, percentage = perform_fake_news_check(query, request)
+
+            return JsonResponse({
+                "authentic": status_text,
+                "accuracy": percentage,
+                "searchfor": query
+            })
+        except Exception as e:
+            return JsonResponse({"status": False, "error": str(e)})
+
+    return JsonResponse({"status": False})
+
+def GetReviews(request):
+    feedbacks = Feedback.objects.select_related('user').all()
+    data = []
+    for f in feedbacks:
+        data.append({
+            "reviews": f.reviews,
+            "message": f.message,
+            "Username": f"{f.user.first_name} {f.user.last_name}"
+        })
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
 def FeedbackPage(request):
-    if request.method=="POST":
-        #checking for user authentication
+    if request.method == "POST":
         if request.user.is_authenticated:
-            message=request.POST.get("message")
-            print(message,request.POST)
+            message = request.POST.get("message")
+            review_score = request.POST.get("review", 5)
+            
             if message:
-                review=request.POST.get("review")
-                feedback=Feedback(user=request.user,message=message,reviews=review)
-                feedback.save()
-            return HttpResponse(json.dumps({
-                "status":True
-            }),content_type="application/json")
+                Feedback.objects.create(
+                    user=request.user,
+                    message=message,
+                    reviews=review_score
+                )
+                return JsonResponse({"status": True})
+            return JsonResponse({"status": False})
         else:
-            return HttpResponse(json.dumps({
-                "authentication":True,
-                "status":False
-            }),content_type="application/json")
-    #response when invalid/(other then post) 
-    return HttpResponse("Invalid Request ", content_type="text/html", status=400)
+            return JsonResponse({"authentication": True, "status": False})
+    return HttpResponse("Invalid Request", status=400)
+
 def ReportIssuePage(request):
-    if request.method=="POST":
-        #checking for user authentication
+    if request.method == "POST":
         if request.user.is_authenticated:
-            message=request.POST.get("message")
-            issue=ReportIssue(user=request.user,message=message)
-            issue.save()
-            return HttpResponse(json.dumps({
-                "status":True
-            }),content_type="application/json")
+            message = request.POST.get("message")
+            if message:
+                ReportIssue.objects.create(user=request.user, message=message)
+                return JsonResponse({"status": True})
+            return JsonResponse({"status": False})
         else:
-            return HttpResponse(json.dumps({
-                "authentication":True,
-                "status":False
-            }),content_type="application/json")
-    #response when invalid/(other then post) 
-    return HttpResponse("Invalid Request ", content_type="text/html", status=400)
+            return JsonResponse({"authentication": True, "status": False})
+    return HttpResponse("Invalid Request", status=400)

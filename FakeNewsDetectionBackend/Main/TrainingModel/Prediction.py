@@ -33,7 +33,9 @@ class FakeNewsLSTM(nn.Module):
         hidden = self.dropout(torch.cat((hidden[-2,:,:], hidden[-1,:,:]), dim=1)) if self.lstm.bidirectional else hidden[-1,:,:]
         output = self.fc(hidden)
         return self.sigmoid(output)
+
     
+
 class Prediction:
     def __init__(self,OC=False, LR=False, GB=False, RF=False, pt=False,vect=False,vocab=False):
         self.OC = OC
@@ -44,6 +46,7 @@ class Prediction:
         self.vect = vect
 
         self.vocab = vocab
+        print(self.vocab)
         self.suf = []
         self.words = [ ]
         
@@ -55,7 +58,6 @@ class Prediction:
         with open(os.path.dirname(__file__) + "\\dict.txt", "r", encoding="utf-8-sig") as s:
             for t in s.read().split("\n"):
                 self.words.append(t)
-
     def clean_text_(self,text):
         text = re.sub(r'[^\u0900-\u097F\s]', '', text)  
         text = re.sub(r'\s+', ' ', text).strip() 
@@ -292,26 +294,26 @@ class Prediction:
         ip = torch.tensor(ps)
         self.op = self.pt(ip)
         
-        # if self.ms[0]==0:
-        #     print("FAKE")
-        # elif self.ms[0] == 1:
-        #     print("REAL")
+        if self.ms[0]==0:
+            print("FAKE")
+        elif self.ms[0] == 1:
+            print("REAL")
         
-        # if self.ns == 0:
-        #     print("FAKE")
-        # else:
-        #     print("REAL")
-        # if self.o == 0:
-        #     print("FAKE")
-        # else:
-        #     print("REAL")
-        # if self.p == 0:
-        #     print("FAKE")
-        # else:
-        #     print("REAL")
-        # if self.op < 0.5:
-        #     print("FAKE")
-        # else:
-        #     print("REAL")
+        if self.ns == 0:
+            print("FAKE")
+        else:
+            print("REAL")
+        if self.o == 0:
+            print("FAKE")
+        else:
+            print("REAL")
+        if self.p == 0:
+            print("FAKE")
+        else:
+            print("REAL")
+        if self.op < 0.5:
+            print("FAKE")
+        else:
+            print("REAL")
 
         return [self.ms.item(), self.ns.item(), self.o.item(),self.p.item(), self.op.item()]

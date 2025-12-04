@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 import Navbar from "./components/Navbar/Navbar";
-import {BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { useState } from "react";
 
 //Pages
@@ -11,26 +11,28 @@ import SearchResult from "./Pages/SearchResult/search_result";
 import Login from "./Pages/Login/login";
 import Register from "./Pages/Register/register";
 import Footer from "./components/Footer/Footer";
-window.LoginError="authentication failed"
-      window.RegistrationErrors={
-      	email:"email already exists",
-      	username:"username already exists",
-      	password_connf:"passwords do not match",
-      	password:"too weak password",
-      	first_name:"first name cannot be empty",
-      	last_name:"last name cannot be empty"
-      }
-      window.getStatic=(path)=>{return ""+ path}
-      window.news=[
-          { category: "Politics", text: "Election results announced.", result: "Authentic" , link:"https://www.example.com"},
-        ];
+window.LoginError = "authentication failed"
+window.RegistrationErrors = {
+	email: "email already exists",
+	username: "username already exists",
+	password_connf: "passwords do not match",
+	password: "too weak password",
+	first_name: "first name cannot be empty",
+	last_name: "last name cannot be empty"
+}
+if (!window.getStatic) {
+	window.getStatic = (path) => { return "" + path }
+}
+window.news = [
+	{ category: "Politics", text: "Election results announced.", result: "Authentic", link: "https://www.example.com" },
+];
 function App() {
 	const [loading, setLoading] = useState(true);
 	const spinner = document.getElementById("loader");
 	if (spinner) {
 		setTimeout(() => {
 			spinner.style.display = "none";
-            setLoading(false)
+			setLoading(false)
 		}, 700);
 	}
 	return (

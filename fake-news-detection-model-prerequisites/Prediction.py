@@ -10,6 +10,7 @@ import pickle
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
+import os
 
 class FakeNewsLSTM(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, n_layers, bidirectional, dropout):
@@ -47,12 +48,12 @@ class Prediction:
         self.suf = []
         self.words = [ ]
         
-        with open("suf.txt", "r", encoding="utf-8-sig") as s:
+        with open(os.path.dirname(__file__) + '\\suf.txt', "r", encoding="utf-8-sig") as s:
             for t in s.read().split("\n"):
                 self.suf.append(t)
         
         
-        with open("dict.txt", "r", encoding="utf-8-sig") as s:
+        with open(os.path.dirname(__file__) + '\\dict.txt', "r", encoding="utf-8-sig") as s:
             for t in s.read().split("\n"):
                 self.words.append(t)
 

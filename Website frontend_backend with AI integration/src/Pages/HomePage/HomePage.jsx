@@ -24,12 +24,21 @@ function HomePage() {
   };
   const [reviews, setReviews] = useState([])
   useEffect(() => {
-    fetch("http://localhost:8000/getReviews").then((res) => {
-      res.json().then((data) => {
+    fetch("http://localhost:8000/getReviews")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
         setReviews(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch reviews:", err);
+        setReviews([]); // Set empty array on error
       });
-    });
-  },[])
+  }, [])
   return (
     <>
       <main className="homepage">
@@ -455,6 +464,7 @@ function HomePage() {
     </>
   );
 }
+
 function PopUpUIFrame({ MainSettings }) {
   const MainUIFrame = useRef(document.createElement("dialog"));
   const newsTextArea = useRef(document.createElement("div"));
@@ -473,7 +483,10 @@ function PopUpUIFrame({ MainSettings }) {
   const shareTwitterButton = useRef(document.createElement("div"));
   const shareWhatsAppButton = useRef(document.createElement("div"));
   MainSettings.MainUIFrame = MainUIFrame;
+
   useEffect(() => {
+    if (!MainUIFrame.current) return;
+
     closeBtn.current.onclick = () => {
       MainUIFrame.current.onclose();
       MainUIFrame.current.close();
@@ -482,11 +495,11 @@ function PopUpUIFrame({ MainSettings }) {
     MainUIFrame.current.onclose = () => {
       MainUIFrame.current.style.height = "0px";
       MainUIFrame.current.firstElementChild.style.opacity = 0;
-    }; // prevent close on
+    };
     MainUIFrame.current.onopen = () => {
       MainUIFrame.current.style.height = "auto";
       MainUIFrame.current.firstElementChild.style.opacity = 1;
-    }; // prevent close on
+    };
     if (MainUIFrame.current.open) {
       MainUIFrame.current.onopen();
     } else {
@@ -497,111 +510,109 @@ function PopUpUIFrame({ MainSettings }) {
       predictionResult.current.firstElementChild.style.display = "none";
       MainUIFrame.current.showModal();
     };
+
     // Fake news prediction function
     predictionResult.current.firstElementChild.style.display = "none";
     function predictNews(content) {
-      if (window.chrome) {
-        predictionResult.current.firstElementChild.style.display = "block";
-        predictionResult.current.style.display = "block";
-        socialShareDiv.current.style.display = "none";
-        predictionResult.current.lastElementChild.style.display = "none";
-        //sending to background js to make response to server
-        const formdata = new FormData();
-        formdata.append("content", content);
-        formdata.append(
-          "csrfmiddlewaretoken",
-          document
-            .querySelector('input[name="csrfmiddlewaretoken"]')
-            .value.trim()
-        );
-        fetch("http://localhost:8000/search_for_extension", {
-          method: "POST",
-          body: formdata,
+      predictionResult.current.firstElementChild.style.display = "block";
+      predictionResult.current.style.display = "block";
+      socialShareDiv.current.style.display = "none";
+      predictionResult.current.lastElementChild.style.display = "none";
+
+      const formdata = new FormData();
+      formdata.append("content", content);
+      const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]');
+      if (csrfToken) {
+        formdata.append("csrfmiddlewaretoken", csrfToken.value.trim());
+      }
+
+      fetch("http://localhost:8000/search_for_extension", {
+        method: "POST",
+        body: formdata,
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
         })
-          .then((res) => res.json())
-          .then((results) => {
-            console.log(results);
-            submitButton.current.disabled = false;
-            newsTextArea.current.nextElementSibling.innerHTML = "";
+        .then((results) => {
+          console.log(results);
+          if (submitButton.current) submitButton.current.disabled = false;
+          if (newsTextArea.current) newsTextArea.current.nextElementSibling.innerHTML = "";
+          if (predictionResult.current) {
             predictionResult.current.firstElementChild.style.display = "none";
             predictionResult.current.lastElementChild.style.display = "block";
-            //dom render when result updated
+          }
 
-            if (results.connection !== false) {
-              predictionResult.current.lastElementChild.querySelector(
-                ".description"
-              ).innerHTML = results.searchfor;
-              predictionResult.current.lastElementChild.querySelector(
-                ".date"
-              ).innerHTML = results.accuracy.toFixed(2) + "%";
-              predictionResult.current.lastElementChild.querySelector(
-                ".source"
-              ).innerHTML = results.authentic;
-              predictionResult.current.lastElementChild.querySelector(
-                "h3"
-              ).innerHTML = "";
-            } else {
-              socialShareDiv.current.style.display = "none";
-              predictionResult.current.lastElementChild.querySelector(
-                "h3"
-              ).style.color = "red";
-              predictionResult.current.lastElementChild.querySelector(
-                ".description"
-              ).innerHTML = results.news.description;
-              predictionResult.current.lastElementChild.querySelector(
-                ".date"
-              ).innerHTML = results.news.date;
-              predictionResult.current.lastElementChild.querySelector(
-                ".source"
-              ).innerHTML = "";
-              predictionResult.current.lastElementChild.querySelector(
-                ".date"
-              ).onclick = null;
-              predictionResult.current.lastElementChild.querySelector(
-                "h3"
-              ).innerHTML = results.news.title;
-            }
-          });
-      }
+          if (results.connection !== false) {
+            predictionResult.current.lastElementChild.querySelector(".description").innerHTML = results.searchfor;
+            predictionResult.current.lastElementChild.querySelector(".date").innerHTML = results.accuracy.toFixed(2) + "%";
+            predictionResult.current.lastElementChild.querySelector(".source").innerHTML = results.authentic;
+            predictionResult.current.lastElementChild.querySelector("h3").innerHTML = "";
+          } else {
+            socialShareDiv.current.style.display = "none";
+            predictionResult.current.lastElementChild.querySelector("h3").style.color = "red";
+            predictionResult.current.lastElementChild.querySelector(".description").innerHTML = results.news.description;
+            predictionResult.current.lastElementChild.querySelector(".date").innerHTML = results.news.date;
+            predictionResult.current.lastElementChild.querySelector(".source").innerHTML = "";
+            predictionResult.current.lastElementChild.querySelector(".date").onclick = null;
+            predictionResult.current.lastElementChild.querySelector("h3").innerHTML = results.news.title;
+          }
+        })
+        .catch(err => {
+          console.error("Prediction error:", err);
+          if (submitButton.current) submitButton.current.disabled = false;
+          if (predictionResult.current) {
+            predictionResult.current.firstElementChild.style.display = "none";
+            predictionResult.current.lastElementChild.style.display = "block";
+            predictionResult.current.lastElementChild.querySelector("h3").style.color = "red";
+            predictionResult.current.lastElementChild.querySelector("h3").innerHTML = "Error";
+            predictionResult.current.lastElementChild.querySelector(".description").innerHTML =
+              "Failed to get prediction. Please try again.";
+            predictionResult.current.lastElementChild.querySelector(".date").innerHTML = "";
+            predictionResult.current.lastElementChild.querySelector(".source").innerHTML = "";
+          }
+        });
     }
+
     // Update social share buttons
     function updateSocialShareButtons(message) {
-      // socialShareDiv.current.style.display = "block";
-      shareFacebookButton.current.onclick = function () {
-        //sending to background js to make response to server and generating sharing link
-        window.chrome.runtime.sendMessage({
-          command: "ShareResult",
-          shareto: "facebook",
-          searchfor: message,
-        });
-      };
-      shareTwitterButton.current.onclick = function () {
-        //sending to background js to make response to server and generating sharing link
-        window.chrome.runtime.sendMessage({
-          command: "ShareResult",
-          shareto: "twitter",
-          searchfor: message,
-        });
-      };
-
-      shareWhatsAppButton.current.onclick = function () {
-        //sending to background js to make response to server and generating sharing link
-        window.chrome.runtime.sendMessage({
-          command: "ShareResult",
-          shareto: "whatsapp",
-          searchfor: message,
-        });
-      };
-      CopyLink.current.onclick = function () {
-        window.chrome.runtime.sendMessage({
-          command: "ShareResult",
-          shareto: "copy",
-          searchfor: message,
-        });
-      };
+      if (window.chrome && window.chrome.runtime) {
+        shareFacebookButton.current.onclick = function () {
+          window.chrome.runtime.sendMessage({
+            command: "ShareResult",
+            shareto: "facebook",
+            searchfor: message,
+          });
+        };
+        shareTwitterButton.current.onclick = function () {
+          window.chrome.runtime.sendMessage({
+            command: "ShareResult",
+            shareto: "twitter",
+            searchfor: message,
+          });
+        };
+        shareWhatsAppButton.current.onclick = function () {
+          window.chrome.runtime.sendMessage({
+            command: "ShareResult",
+            shareto: "whatsapp",
+            searchfor: message,
+          });
+        };
+        CopyLink.current.onclick = function () {
+          window.chrome.runtime.sendMessage({
+            command: "ShareResult",
+            shareto: "copy",
+            searchfor: message,
+          });
+        };
+      }
     }
+
     // Update language
     function updateLanguage() {
+      if (!title.current) return;
       title.current.textContent =
         currentLanguage === "en"
           ? "News Authenenticity Detector"
@@ -615,12 +626,12 @@ function PopUpUIFrame({ MainSettings }) {
           ? "Insert News' Text Here:"
           : "यहाँ समाचारको पाठ राख्नुहोस्:";
       feedbackBtn.current.textContent =
-        currentLanguage === "en" ? "send Feedback" : "प्रतिक्रिया पठाउनुहोस्";
+        currentLanguage === "en" ? "Send Feedback" : "प्रतिक्रिया पठाउनुहोस्";
       submitButton.current.textContent =
         currentLanguage === "en" ? "Predict" : "पूर्वानुमान गर्नुहोस्";
       newsTextArea.current.placeholder =
         currentLanguage === "en"
-          ? "Paste or type news content here..."
+          ? "Paste or type news content here.."
           : "यहाँ समाचारको पाठ टाइप वा पेस्ट गर्नुहोस्...";
 
       if (newsTextArea.current.nextElementSibling.textContent.trim()) {
@@ -636,9 +647,11 @@ function PopUpUIFrame({ MainSettings }) {
             : "कृपया केही सामग्री प्रविष्ट गर्नुहोस्!";
       }
     }
+
     socialShareDiv.current.style.display = "none";
+
     // Predict news when submit button is clicked
-    submitButton.current.onclick= function () {
+    submitButton.current.onclick = function () {
       const newsContent = newsTextArea.current.value.trim();
       if (newsContent.length >= 5) {
         predictNews(newsContent);
@@ -653,26 +666,24 @@ function PopUpUIFrame({ MainSettings }) {
             : "कृपया केही समाचार प्रविष्ट गर्नुहोस्!";
       }
     }
+
     feedbackBtn.onclick = (e) => {
       e.preventDefault();
       const feedback = feedbacktextarea.current.value.trim();
       if (feedback.length >= 5) {
         feedbacktextarea.current.nextElementSibling.innerHTML = "";
         feedbacktextarea.current.value = "";
-        // ...
         MainUIFrame.current.close();
-        if (window.chrome) {
+        if (window.chrome && window.chrome.runtime) {
           window.chrome.runtime.sendMessage(
             {
               command: "Feedback",
               feedback,
             },
-            (response) => {}
+            (response) => { }
           );
         }
       } else {
-        // predictionResult.current.style.display = 'none';
-        // socialShareDiv.current.style.display = 'none';
         feedbacktextarea.current.nextElementSibling.innerHTML =
           currentLanguage === "en"
             ? "Please enter some content!(atleast 5 character)"
@@ -689,8 +700,8 @@ function PopUpUIFrame({ MainSettings }) {
 
     // Initialize language
     updateLanguage();
-    return () => {};
-  });
+  }, []); // Added dependency array to run once on mount
+
   return (
     <div className="text-content">
       <dialog ref={MainUIFrame} className="mainuiframe">

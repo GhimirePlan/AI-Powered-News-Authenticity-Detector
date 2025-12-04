@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    		<link rel="icon" type="image/svg+xml" href="{% static 'assets/favicon.png' %}" />
 
     <!-- Google Fonts (Roboto) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,7 +24,7 @@
       	first_name:"first name cannot be empty",
       	last_name:"last name cannot be empty"
       }
-      window.getStatic=(path)=>{return "{% static "" %}"+ path}
+      window.getStatic=(path)=>{return "{%static ''%}"+ path}
       window.news=[
           { category: "Politics", text: "Election results announced.", result: "Authentic" , link:"https://www.example.com"},
         ];
@@ -198,9 +198,8 @@
       		-webkit-transform: rotate(-48deg);
       	}
       </style>
-      <script type="module" crossorigin src="{% static "assets/index.a1d54ef9.js" %}">
-    </script>
-    <link rel="stylesheet" href="{% static "assets/index.d168b669.css" %}">
+      <script type="module" crossorigin src="{% static 'assets/index.1852600a.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'assets/index.691ce9d2.css' %}">
   </head>
   <body>
 	{% csrf_token %}

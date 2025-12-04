@@ -1,0 +1,18 @@
+# Web Framework
+django>=3.2.25
+
+# Web Scraping
+selenium
+beautifulsoup4
+openpyxl
+
+# Data Analysis & Machine Learning
+pandas
+scipy
+torch
+nltk
+scikit-learn==1.5.2
+
+# Utilities
+googletrans==4.0.0-rc1  # Using a release candidate as the stable version often has issues
+psycopg2-binary

@@ -26,19 +26,21 @@ class TrainModel:
             count+=1
             if numfake<=count:
                 break
-        with open(os.path.dirname(__file__) + '\\RF.pkl', 'rb') as f:
+        for data in News.objects.all():
+            print(data.description)
+        with open(os.path.dirname(__file__) + '\RF.pkl', 'rb') as f:
             RF = pickle.load(f)
         with open(os.path.dirname(__file__) + '\GB.pkl', 'rb') as f:
             GB = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\\LR.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\LR.pkl', 'rb') as f:
             LR = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\\OC.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\OC.pkl', 'rb') as f:
             OC = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\\vect.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\vect.pkl', 'rb') as f:
             vect = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\\PT.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\PT.pkl', 'rb') as f:
             pt = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\\vocab.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\vocab.pkl', 'rb') as f:
             vocab = pickle.load(f)
 
         pp = Prediction(OC, LR, GB, RF,pt, vect, vocab)
