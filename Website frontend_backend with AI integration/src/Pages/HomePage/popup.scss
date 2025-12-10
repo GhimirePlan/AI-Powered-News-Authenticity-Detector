@@ -1,517 +1,556 @@
 /* General Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* dialog.mainuiframe and Background */
+dialog.mainuiframe {
+  font-family: 'Roboto', sans-serif;
+  /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  padding-right: 0px;
+  background-color: transparent;
+
+}
+
+dialog.mainuiframe .container {
+  overflow: visible;
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
+  -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.397);
+  -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.288);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  z-index: 9998989898;
+  max-width: 300px;
+  min-width: 300px;
+  padding: 5px;
+  border-radius: 20px;
+  max-height: fit-content;
+  height: fit-content;
+  text-align: center;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 0px;
+  z-index: 99;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background-color: red;
+  color: white;
+}
+
+dialog::backdrop {
+  background-color: turquoise;
+  opacity: 0.2;
+}
+
+label {
+  padding-left: 10px !important;
+  font-size: 15px;
+}
+
+div.error {
+  color: red;
+  padding-left: 10px !important;
+  font-size: 15px;
+}
+
+dialog.mainuiframe h3 {
+  font-size: 17px;
+}
+
+dialog.mainuiframe #language-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* Container Styling */
+dialog.mainuiframe .container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  background-color: #ffffff;
+  height: 100%;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  overflow: hidden;
+  overflow-y: scroll;
+  max-height: 550px;
+
+}
+
+dialog.mainuiframe .container .content form {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  width: 100%;
+}
+
+dialog.mainuiframe .container .content {
+  width: 100%;
+}
+
+dialog.mainuiframe .container h3 {
+  text-align: left;
+}
+
+dialog.mainuiframe .container:hover {
+  transform: scale(1.02);
+}
+
+dialog.mainuiframe .container label {
+  color: blue;
+}
+
+/* Title */
+#title {
+  font-size: 25px;
+  font-weight: bold;
+  color: #2575fc;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: fadeIn 1s ease-out;
+}
+
+/* Language Toggle Container */
+.toggle-container {
+  position: relative;
+  width: 100px;
+  height: 45px;
+  background-color: #ccc;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 38px;
+  height: 38px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: left 0.3s ease, transform 0.3s ease;
+}
+
+.toggle-container.active {
+  background-color: #4caf50;
+}
+
+.toggle-container.active .toggle-switch {
+  left: 55px;
+  transform: scale(1.1);
+}
+
+.toggle-container .left,
+.toggle-container .right {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.toggle-container.active .left {
+  opacity: 0.3;
+}
+
+.toggle-container.active .right {
+  opacity: 1;
+}
+
+/* Textarea Styling */
+textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  /* Disable manual resizing */
+  margin-bottom: 20px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  /* Hide scrollbar */
+}
+
+/* Textarea Focus Effect */
+textarea:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 8px rgba(37, 117, 252, 0.5);
+}
+
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  margin: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+button#submit-button {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+button#submit-button:hover {
+  background-color: #45a049;
+}
+
+button#auto-paste {
+  background-color: #2575fc;
+  color: #fff;
+}
+
+button#auto-paste:hover {
+  background-color: #1c62db;
+}
+
+/* Prediction Result */
+#prediction-result {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #333;
+  animation: fadeIn 1s ease-out;
+}
+
+#feedback-section {
+  margin-top: 20px;
+  display: none;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#feedback-header {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #2575fc;
+}
+
+.radio-group {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.radio-group label {
+  font-size: 16px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 8px;
+}
+
+#feedback-form button {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+#feedback-form button:hover {
+  background-color: #1976d2;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  /* dialog.mainuiframe and Background */
-  dialog.mainuiframe {
-    font-family: 'Roboto', sans-serif;
-    /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    padding-right: 0px;
-    background-color: transparent;
-  
-  }
-  dialog.mainuiframe .container {
-    overflow: visible;
-    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
-    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.397);
-    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.288);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    z-index: 9998989898;
-    max-width: 300px;
-    min-width: 300px;
-    padding: 5px;
-    border-radius: 20px;
-    max-height: fit-content;
-    height: fit-content;
-    text-align: center;
-    position: relative;
-  }
-  .close-button{
-    position: absolute;
-    top: 5px;
-    right: 0px;
-    z-index: 99;
-    font-size: 18px;
-    font-weight: 800;
-    cursor: pointer;
-    height: 30px;
-    width: 30px;
-    padding: 10px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .close-button:hover{
-    background-color: red;
-    color: white;   
-  }
-  dialog::backdrop{
-    background-color: turquoise;
-    opacity: 0.2;
-  }
-  label{
-    padding-left: 10px!important;
-    font-size: 15px;
-  }
-  div.error{
-    color: red;
-    padding-left: 10px!important;
-    font-size: 15px;
-  }
-  dialog.mainuiframe h3{
-    font-size: 17px;
-  }
-  dialog.mainuiframe #language-switcher {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 18px;
-  }
-  
-  /* Container Styling */
-  dialog.mainuiframe .container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    width: 100%;
-    background-color: #ffffff;
-    height: 100%;
-    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
-    overflow: hidden;
-    overflow-y: scroll;
-    max-height: 550px;
-   
-  }
-  dialog.mainuiframe .container .content form {
-    display: flex;
-    align-items: start;
-    flex-direction: column;
-    width: 100%;
-  }
-  dialog.mainuiframe .container .content{
-    width: 100%;
-  }
-  
-  dialog.mainuiframe .container h3{
-    text-align: left;
-  }
-  dialog.mainuiframe .container:hover {
-    transform: scale(1.02);
-  }
-  dialog.mainuiframe .container label{
-    color: blue;
-  }
-  /* Title */
-  #title {
-    font-size: 25px;
-    font-weight: bold;
-    color: #2575fc;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    animation: fadeIn 1s ease-out;
-  }
-  
-  /* Language Toggle Container */
-  .toggle-container {
-    position: relative;
-    width: 100px;
-    height: 45px;
-    background-color: #ccc;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background-color 0.4s ease;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .toggle-switch {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 38px;
-    height: 38px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: left 0.3s ease, transform 0.3s ease;
-  }
-  
-  .toggle-container.active {
-    background-color: #4caf50;
-  }
-  
-  .toggle-container.active .toggle-switch {
-    left: 55px;
-    transform: scale(1.1);
-  }
-  
-  .toggle-container .left,
-  .toggle-container .right {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-  }
-  
-  .toggle-container.active .left {
-    opacity: 0.3;
-  }
-  
-  .toggle-container.active .right {
+
+  100% {
     opacity: 1;
-  }
-  
-  /* Textarea Styling */
-  textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    resize: none;
-    /* Disable manual resizing */
-    margin-bottom: 20px;
-    transition: border 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-    /* Hide scrollbar */
-  }
-  
-  /* Textarea Focus Effect */
-  textarea:focus {
-    border-color: #2575fc;
-    box-shadow: 0 0 8px rgba(37, 117, 252, 0.5);
-  }
-  
-  
-  button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    margin: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  button:hover {
-    transform: scale(1.05);
-  }
-  
-  button#submit-button {
-    background-color: #4caf50;
-    color: #fff;
-  }
-  
-  button#submit-button:hover {
-    background-color: #45a049;
-  }
-  
-  button#auto-paste {
-    background-color: #2575fc;
-    color: #fff;
-  }
-  
-  button#auto-paste:hover {
-    background-color: #1c62db;
-  }
-  
-  /* Prediction Result */
-  #prediction-result {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #333;
-    animation: fadeIn 1s ease-out;
-  }
-  
-  #feedback-section {
-    margin-top: 20px;
-    display: none;
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  #feedback-header {
-    font-size: 20px;
-    margin-bottom: 15px;
-    color: #2575fc;
-  }
-  
-  .radio-group {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 15px;
-  }
-  
-  .radio-group label {
-    font-size: 16px;
-    color: #333;
-    transition: color 0.3s ease;
-  }
-  
-  .radio-group input[type="radio"] {
-    margin-right: 8px;
-  }
-  
-  #feedback-form button {
-    background-color: #2196f3;
-    color: #fff;
-  }
-  
-  #feedback-form button:hover {
-    background-color: #1976d2;
-  }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-  
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Dark Mode */
-  dialog.mainuiframe.dark-mode {
-    background: linear-gradient(135deg, #1e1e1e, #333);
-    color: #fff;
-  }
-  
-  dialog.mainuiframe .container.dark-mode {
-    background-color: #222;
-  }
-  
-  textarea.dark-mode {
-    background-color: #333;
-    color: white;
-    border-color: #4CAF50;
-  }
-  
-  button.dark-mode {
-    background-color: #333;
-    color: #fff;
-  }
-  
-  button.dark-mode:hover {
-    background-color: #555;
-  }
-  
-  #title.dark-mode,
-  #prediction-result.dark-mode,
-  #feedback-header.dark-mode {
-    color: #fff;
-  }
-  
-  #feedback-section.dark-mode {
-    background-color: #444;
-  }
-  
-  .toggle-container.active.dark-mode {
-    background-color: #4caf50;
-  }
-  
-  .toggle-switch.dark-mode {
-    background-color: #fff;
-  }
-  
-  /* Mobile responsiveness */
-  
-  
-  #social-share {
-    margin-top: 20px;
-    text-align: center;
-    animation: fadeIn 0.8s ease-in-out;
-  }
-  
-  #social-share h3 {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 1px;
-    font-weight: bold;
-    letter-spacing: 1.2px;
-  }
-  
-  .share-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-  
-  .share-button {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(45deg, #6a11cb, #2575fc);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-  }
-  
-  .share-button i {
-    font-size: 20px;
-    z-index: 2;
-  }
-  
-  .share-button::before {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -100%;
-    left: -100%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(45deg);
-    transition: all 0.5s ease;
-    z-index: 1;
-  }
-  
-  .share-button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-  }
-  
-  .share-button:hover::before {
-    top: 0;
-    left: 0;
-  }
-  
-  .share-button:hover i {
-    transform: scale(1.2);
-  }
-  
-  .share-button:active {
     transform: translateY(0);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
-  
-  .share-button.facebook {
-    background: linear-gradient(45deg, #3b5998, #8b9dc3);
+}
+
+/* Dark Mode */
+dialog.mainuiframe.dark-mode {
+  background: linear-gradient(135deg, #1e1e1e, #333);
+  color: #fff;
+}
+
+dialog.mainuiframe .container.dark-mode {
+  background-color: #222;
+}
+
+textarea.dark-mode {
+  background-color: #333;
+  color: white;
+  border-color: #4CAF50;
+}
+
+button.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
+
+button.dark-mode:hover {
+  background-color: #555;
+}
+
+#title.dark-mode,
+#prediction-result.dark-mode,
+#feedback-header.dark-mode {
+  color: #fff;
+}
+
+#feedback-section.dark-mode {
+  background-color: #444;
+}
+
+.toggle-container.active.dark-mode {
+  background-color: #4caf50;
+}
+
+.toggle-switch.dark-mode {
+  background-color: #fff;
+}
+
+/* Mobile responsiveness */
+
+
+#social-share {
+  margin-top: 20px;
+  text-align: center;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+#social-share h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 1px;
+  font-weight: bold;
+  letter-spacing: 1.2px;
+}
+
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.share-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(45deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.share-button i {
+  font-size: 20px;
+  z-index: 2;
+}
+
+.share-button::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -100%;
+  left: -100%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.share-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.share-button:hover::before {
+  top: 0;
+  left: 0;
+}
+
+.share-button:hover i {
+  transform: scale(1.2);
+}
+
+.share-button:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.share-button.facebook {
+  background: linear-gradient(45deg, #3b5998, #8b9dc3);
+}
+
+.share-button.twitter {
+  background: linear-gradient(45deg, #1da1f2, #0e71c8);
+}
+
+.share-button.whatsapp {
+  background: linear-gradient(45deg, #25d366, #128c7e);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .share-button.twitter {
-    background: linear-gradient(45deg, #1da1f2, #0e71c8);
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .share-button.whatsapp {
-    background: linear-gradient(45deg, #25d366, #128c7e);
+}
+
+.content-component {
+  max-height: 400px;
+  padding-right: 5px;
+  overflow-y: scroll;
+  font-size: 16px;
+
+}
+
+.content-component .description {
+  text-align: justify;
+}
+
+.loadingicon {
+  text-align: center;
+}
+
+.content-component .report {
+  color: rgb(0, 217, 255);
+}
+
+.content-component .report:hover {
+  text-decoration: underline;
+}
+
+.content-component h3 {
+  text-align: left;
+  font-weight: 800;
+}
+
+.content-component .date {
+  font-weight: 600;
+  width: 100%;
+  text-align: right;
+}
+
+.content-component .inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spinners-react-circular {
+  0% {
+    stroke-dashoffset: 306;
+    stroke-dasharray: 96, 101;
   }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-  
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+
+  50% {
+    stroke-dashoffset: 270;
+    stroke-dasharray: 80, 134;
   }
-  .content-component {
-    max-height: 400px;
-    padding-right: 5px;
-    overflow-y: scroll;
-    font-size: 16px;
-  
+
+  100% {
+    stroke-dasharray: 80, 174;
+    stroke-dashoffset: 132;
   }
-  
-  .content-component  .description {
-    text-align: justify;
-  }
-  .loadingicon{
-    text-align: center;
-  }
-  .content-component  .report {
-    color: rgb(0, 217, 255);
-  }
-  
-  .content-component  .report:hover {
-    text-decoration: underline;
-  }
-  .content-component h3{
-    text-align: left;
-    font-weight: 800;
-  }
-  .content-component  .date {
-    font-weight: 600;
-    width: 100%;
-    text-align: right;
-  }
-  
-  .content-component  .inner {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  @keyframes spinners-react-circular {
-    0% {
-      stroke-dashoffset: 306;
-      stroke-dasharray: 96, 101;
-    }
-  
-    50% {
-      stroke-dashoffset: 270;
-      stroke-dasharray: 80, 134;
-    }
-  
-    100% {
-      stroke-dasharray: 80, 174;
-      stroke-dashoffset: 132;
-    }
-  }
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #8cd1f1;
-    border-radius: 10px;
+  background: #8cd1f1;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar:hover {
-    width: 10px;
-    height: 10px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    width: 10px;
-    height: 10px;
-    background: #8cd1f1;
+  width: 10px;
+  height: 10px;
+  background: #8cd1f1;
 }
+/* Star Rating */
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.star-rating img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.star-rating img:hover {
+  transform: scale(1.2);
+}
+

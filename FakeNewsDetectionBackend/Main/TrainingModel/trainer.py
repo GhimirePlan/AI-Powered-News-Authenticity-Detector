@@ -26,9 +26,11 @@ class TrainModel:
             count+=1
             if numfake<=count:
                 break
+        for data in News.objects.all():
+            print(data.description)
         with open(os.path.dirname(__file__) + '\\RF.pkl', 'rb') as f:
             RF = pickle.load(f)
-        with open(os.path.dirname(__file__) + '\GB.pkl', 'rb') as f:
+        with open(os.path.dirname(__file__) + '\\GB.pkl', 'rb') as f:
             GB = pickle.load(f)
         with open(os.path.dirname(__file__) + '\\LR.pkl', 'rb') as f:
             LR = pickle.load(f)

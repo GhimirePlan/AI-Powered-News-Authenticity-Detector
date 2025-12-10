@@ -11,7 +11,8 @@ export default function Main() {
     const MainSettings = {
         onreportAdd: (issue) => {
             if (window.chrome.runtime) {
-                window.chrome.runtime.sendMessage({url:window.location.href,
+                window.chrome.runtime.sendMessage({
+                    url: window.location.href,
                     command: "ReportIssue",
                     message: issue
                 }, (response) => {
@@ -22,7 +23,8 @@ export default function Main() {
         onfeedbackAdd: (feedback) => {
             console.log(feedback)
             if (window.chrome.runtime) {
-                window.chrome.runtime.sendMessage({url:window.location.href,
+                window.chrome.runtime.sendMessage({
+                    url: window.location.href,
                     command: "Feedback",
                     message: feedback
                 }, (response) => {
@@ -42,7 +44,7 @@ export default function Main() {
 
             // 1. Send a message to the service worker requesting the news information
             if (window.chrome.runtime) {
-                window.chrome.runtime.sendMessage({url:window.location.href, command: 'CheckNewsForthis', clipboard: false, news: content }, (response) => {
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: 'CheckNewsForthis', clipboard: false, news: content }, (response) => {
                     MainSettings.onresultResponse(response)
                 });
             }
@@ -250,7 +252,7 @@ function UIWindow({ MainSettings }) {
                 socialShareDiv.current.style.display = 'none'
                 predictionResult.current.lastElementChild.style.display = 'none'
                 //sending to background js to make response to server
-                window.chrome.runtime.sendMessage({url:window.location.href, command: 'CheckNewsForthis', clipboard: true, news: content }, (results) => {
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: 'CheckNewsForthis', clipboard: true, news: content }, (results) => {
                     setTimeout(() => {
                         submitButton.current.disabled = false
                     }, 10);
@@ -264,7 +266,7 @@ function UIWindow({ MainSettings }) {
                         updateSocialShareButtons(content)
                         predictionResult.current.lastElementChild.querySelector("h3").style.color = 'black'
                         predictionResult.current.lastElementChild.querySelector(".description").innerHTML = results.searchfor
-                        predictionResult.current.lastElementChild.querySelector(".date").innerHTML =results.accuracy? results.accuracy.toFixed(2) + "%":""
+                        predictionResult.current.lastElementChild.querySelector(".date").innerHTML = results.accuracy ? results.accuracy.toFixed(2) + "%" : ""
                         predictionResult.current.lastElementChild.querySelector(".source").innerHTML = results.authentic
                         predictionResult.current.lastElementChild.querySelector(".date").classList.add("remove")
                         predictionResult.current.lastElementChild.querySelector(".date").onclick = null
@@ -289,19 +291,19 @@ function UIWindow({ MainSettings }) {
             socialShareDiv.current.style.display = 'block'
             shareFacebookButton.current.onclick = function () {
                 //sending to background js to make response to server and generating sharing link
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "facebook", searchfor: message })
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "facebook", searchfor: message })
             };
             shareTwitterButton.current.onclick = function () {
                 //sending to background js to make response to server and generating sharing link
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "twitter", searchfor: message })
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "twitter", searchfor: message })
 
             };
             shareWhatsAppButton.current.onclick = function () {
                 //sending to background js to make response to server and generating sharing link
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "whatsapp", searchfor: message })
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "whatsapp", searchfor: message })
             };
             CopyLink.current.onclick = function () {
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "Copy", searchfor: message }, (linkToCopy) => {
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "Copy", searchfor: message }, (linkToCopy) => {
                     navigator.clipboard
                         .writeText(linkToCopy)
                         .then(() => {
@@ -323,7 +325,7 @@ function UIWindow({ MainSettings }) {
                 : 'प्रतिक्रिया पठाउनुहोस्';
             submitButton.current.textContent = currentLanguage === 'en' ? 'Predict' : 'पूर्वानुमान गर्नुहोस्';
             newsTextArea.current.placeholder =
-                currentLanguage === 'en' ? 'Paste or type news content here...' : 'यहाँ समाचारको पाठ टाइप वा पेस्ट गर्नुहोस्...';
+                currentLanguage === 'en' ? 'Paste or type news content here...' : 'यहाँ समाचारको पाठ टाइप वा पेस्ट गर्नुहोस्...aaa';
 
             if (newsTextArea.current.nextElementSibling.textContent.trim()) {
                 newsTextArea.current.nextElementSibling.innerHTML = currentLanguage === 'en'
@@ -503,14 +505,14 @@ function ResultFrame({ MainSettings }) {
         function updateSocialShareButtons(message) {
             sharebuttons.current.style.display = 'block'
             shareFacebookButton.onclick = function () {
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "facebook", searchfor: message })
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "facebook", searchfor: message })
             };
             shareTwitterButton.onclick = function () {
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "twitter", searchfor: message })
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "twitter", searchfor: message })
             };
 
             shareMore.onclick = function () {
-                window.chrome.runtime.sendMessage({url:window.location.href, command: "ShareResult", shareto: "Copy", searchfor: message }, (linkToCopy) => {
+                window.chrome.runtime.sendMessage({ url: window.location.href, command: "ShareResult", shareto: "Copy", searchfor: message }, (linkToCopy) => {
                     navigator.clipboard
                         .writeText(linkToCopy)
                         .then(() => {
@@ -530,7 +532,7 @@ function ResultFrame({ MainSettings }) {
             resultframe.current.style.display = 'block'
             if (results.connection !== false) {
                 resultframe.current.querySelector(".description").innerHTML = results.searchfor
-                resultframe.current.querySelector(".date").innerHTML =results.accuracy? results.accuracy.toFixed(2) + "%":""
+                resultframe.current.querySelector(".date").innerHTML = results.accuracy ? results.accuracy.toFixed(2) + "%" : ""
                 resultframe.current.querySelector(".source").innerHTML = results.authentic
                 resultframe.current.querySelector("h3").innerHTML = ''
                 sharebuttons.current.style.display = 'block'

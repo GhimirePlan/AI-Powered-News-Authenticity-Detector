@@ -11,9 +11,11 @@
     top: 0;
     z-index: 1000
 }
+
 tr td:first-child {
-    text-align: justify!important;
+    text-align: justify !important;
 }
+
 .nav-container {
     display: flex;
     justify-content: center;
@@ -1243,7 +1245,6 @@ button.dark-mode:hover {
 
 .content-component .report {
     color: #00d9ff
-    
 }
 
 
